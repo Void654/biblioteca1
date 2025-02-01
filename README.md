@@ -13,8 +13,7 @@ Antes de começar, certifique-se de ter instalado:
 ## 📂 **Instalação**
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   cd seu-repositorio
+   git clone https://github.com/jxhnlcs/fullstack_biblioteca-symfony.git
    ```
 
 2. Instale as dependências do projeto:
