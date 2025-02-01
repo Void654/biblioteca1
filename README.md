@@ -1,6 +1,6 @@
-# 📚 API de Biblioteca com Symfony
+# 📚 Sistema de Biblioteca com Symfony e Twig
 
-Este projeto é uma API RESTful para gerenciamento de livros, construída com **Symfony** e banco de dados **MySQL**.  
+Este projeto é um Sistema FullStack para gerenciamento de livros, construída com **Symfony**, **Twig** e banco de dados **MySQL**.  
 
 ## 🚀 **Pré-requisitos**
 Antes de começar, certifique-se de ter instalado:
