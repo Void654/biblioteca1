@@ -1,19 +1,17 @@
-# 📚 Sistema de Biblioteca com Symfony e Twig
+# Sistema de Gestão de Biblioteca com Symfony e Twig
 
-Este projeto é um Sistema FullStack para gerenciamento de livros, construída com **Symfony**, **Twig** e banco de dados **MySQL**.  
+Este projeto é um Sistema FullStack para gestar livros, construído com **Symfony**, **Twig** e banco de dados **MySQL**.  
 
-## 🚀 **Pré-requisitos**
-Antes de começar, certifique-se de ter instalado:
+## Requisitos **
+Tenha Instalado na máquina:
 - **PHP 8.1+**
 - **Composer**
 - **Symfony CLI**
-- **MySQL** (ou outro banco de dados compatível)
-- **Node.js e npm** (se for usar frontend separado)
+- **MySQL** 
 
-## 📂 **Instalação**
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/jxhnlcs/fullstack_biblioteca-symfony.git
+   git clone https://github.com/Void654/biblioteca1.git
    ```
 
 2. Instale as dependências do projeto:
@@ -40,7 +38,7 @@ Antes de começar, certifique-se de ter instalado:
     php bin/console doctrine:fixtures:load
     ```
 
-## 🔥 **Rodando o Servidor Symfony**
+##  **Rodando o Servidor**
 
 1. Inicie o servidor local com:
 
@@ -50,10 +48,10 @@ Antes de começar, certifique-se de ter instalado:
 
 2. A aplicação estará disponível em:
     ```bash
-    👉 http://127.0.0.1:8000
+      http://127.0.0.1:8000
     ```
 
-## 📖 **Lista de Endpoints**
+##  **Lista de Endpoints**
 
   | Método  | Rota              | Descrição                  |
   |---------|------------------|-----------------------------|
@@ -63,12 +61,12 @@ Antes de começar, certifique-se de ter instalado:
   | PUT     | `/api/books/{id}` | Atualizar um livro         |
   | DELETE  | `/api/books/{id}` | Remover um livro           |
 
-### 📝 **Exemplo de JSON para Criar um Livro (POST `/api/books`)**
+### **Exemplo de JSON para Criar um Livro (POST `/api/books`)**
   ```json
     {
-      "title": "O Senhor dos Anéis",
-      "author": "J.R.R. Tolkien",
-      "description": "Uma aventura épica na Terra Média.",
-      "year": 1954
+      "title": "Harry Potter",
+      "author": "J. K. Rowling",
+      "description": "Harry Potter e a Pedra Filosofal",
+      "year": 1998
     }
   ```
