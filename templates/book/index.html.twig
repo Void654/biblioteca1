@@ -1,245 +1,342 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Lista de Livros
-{% endblock %}
+{% block title %}Lista de Livros{% endblock %}
 
 {% block body %}
-	<h1>📚 Gestão de Livros</h1>
+<h1>📚 Biblioteca de Livros</h1>
 
-	<!-- Formulário para adicionar ou editar livros -->
-	<form id="book-form">
-		<input type="hidden" id="book-id">
+<!-- Layout principal: usar flexbox para dividir a tela -->
+<div class="main-layout">
+    <!-- Coluna da esquerda: Formulário de registro -->
+    <div class="left-column">
+        <h2>Registrar Livro</h2>
+        <form id="book-form">
+            <input type="hidden" id="book-id">
 
-		<label for="title">📖 Título:</label>
-		<input type="text" id="title" placeholder="Digite o título" required>
+            <label for="title">📖 Título:</label>
+            <input type="text" id="title" placeholder="Digite o título" required>
 
-		<label for="author">✍️ Autor:</label>
-		<input type="text" id="author" placeholder="Digite o autor" required>
+            <label for="author">✍️ Autor:</label>
+            <input type="text" id="author" placeholder="Digite o autor" required>
 
-		<label for="description">📝 Descrição:</label>
-		<textarea id="description" placeholder="Digite a descrição"></textarea>
+            <label for="description">📝 Descrição:</label>
+            <textarea id="description" placeholder="Digite a descrição"></textarea>
 
-		<label for="year">📅 Ano:</label>
-		<input type="number" id="year" placeholder="Digite o ano" required>
+            <label for="year">📅 Ano:</label>
+            <input type="number" id="year" placeholder="Digite o ano" required>
 
-		<button type="submit">Salvar Livro</button>
-	</form>
+            <button type="submit">Salvar Livro</button>
+        </form>
+    </div>
 
-	<!-- Tabela de livros -->
-	<table>
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Título</th>
-				<th>Autor</th>
-				<th>Descrição</th>
-				<th>Ano</th>
-				<th>Ações</th>
-			</tr>
-		</thead>
-		<tbody
-			id="book-list"><!-- Os livros serão carregados aqui via JavaScript -->
-		</tbody>
-	</table>
+    <!-- Coluna da direita: Tabela de livros -->
+    <div class="right-column">
+        <h2>Lista de Livros</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Descrição</th>
+                    <th>Ano</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="book-list">
+                <!-- Os livros serão carregados aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
-	 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	 <script>
-	        document.addEventListener("DOMContentLoaded", function () {
-	            function loadBooks() {
-	                fetch('/api/books')
-	                    .then(response => response.json())
-	                    .then(data => {
-	                        const bookList = document.getElementById("book-list");
-	                        bookList.innerHTML = "";
-	
-	                        data.forEach(book => {
-	                            const row = document.createElement("tr");
-	                            row.innerHTML = `
-	                                <td>${book.id}</td>
-	                                <td>${book.title}</td>
-	                                <td>${book.author}</td>
-	                                <td>${book.description || 'Sem descrição'}</td>
-	                                <td>${book.year}</td>
-	                                <td>
-	                                    <button class="edit-btn" data-id="${book.id}" data-title="${book.title}" data-author="${book.author}" data-description="${book.description}" data-year="${book.year}">✏️ Editar</button>
-	                                    <button class="delete-btn" data-id="${book.id}">🗑️ Excluir</button>
-	                                </td>
-	                            `;
-	                            bookList.appendChild(row);
-	                        });
-	
-	                        // Adicionar eventos para botões de editar e excluir
-	                        document.querySelectorAll('.edit-btn').forEach(button => {
-	                            button.addEventListener('click', function () {
-	                                document.getElementById("book-id").value = this.dataset.id;
-	                                document.getElementById("title").value = this.dataset.title;
-	                                document.getElementById("author").value = this.dataset.author;
-	                                document.getElementById("description").value = this.dataset.description;
-	                                document.getElementById("year").value = this.dataset.year;
-	                            });
-	                        });
-	
-	                        document.querySelectorAll('.delete-btn').forEach(button => {
-	                            button.addEventListener('click', function () {
-	                                deleteBook(this.dataset.id);
-	                            });
-	                        });
-	                    })
-	                    .catch(error => console.error("Erro ao carregar livros:", error));
-	            }
-	
-	            loadBooks();
-	
-	            document.getElementById("book-form").addEventListener("submit", function (event) {
-	                event.preventDefault();
-	
-	                const bookId = document.getElementById("book-id").value;
-	                const title = document.getElementById("title").value;
-	                const author = document.getElementById("author").value;
-	                const description = document.getElementById("description").value;
-	                const year = document.getElementById("year").value;
-	
-	                const method = bookId ? "PUT" : "POST";
-	                const url = bookId ? `/api/books/${bookId}` : "/api/books";
-	
-	                fetch(url, {
-	                    method: method,
-	                    headers: {
-	                        "Content-Type": "application/json"
-	                    },
-	                    body: JSON.stringify({ title, author, description, year })
-	                })
-	                .then(response => {
-	                    if (!response.ok) {
-	                        throw new Error("Erro ao salvar livro");
-	                    }
-	                    return response.json();
-	                })
-	                .then(data => {
-	                    Swal.fire({
-	                        icon: "success",
-	                        title: "Sucesso!",
-	                        text: bookId ? "Livro atualizado com sucesso!" : "Livro adicionado com sucesso!",
-	                    });
-	                    loadBooks();
-	                    document.getElementById("book-form").reset();
-	                    document.getElementById("book-id").value = "";
-	                })
-	                .catch(error => {
-	                    Swal.fire({
-	                        icon: "error",
-	                        title: "Erro!",
-	                        text: "Não foi possível salvar o livro.",
-	                    });
-	                });
-	            });
-	
-	            function deleteBook(bookId) {
-	                Swal.fire({
-	                    title: "Tem certeza?",
-	                    text: "Essa ação não pode ser desfeita!",
-	                    icon: "warning",
-	                    showCancelButton: true,
-	                    confirmButtonColor: "#d33",
-	                    cancelButtonColor: "#3085d6",
-	                    confirmButtonText: "Sim, excluir!"
-	                }).then((result) => {
-	                    if (result.isConfirmed) {
-	                        fetch(`/api/books/${bookId}`, {
-	                            method: "DELETE"
-	                        })
-	                        .then(response => {
-	                            if (!response.ok) {
-	                                throw new Error("Erro ao excluir livro");
-	                            }
-	                            Swal.fire("Deletado!", "O livro foi removido com sucesso.", "success");
-	                            loadBooks();
-	                        })
-	                        .catch(error => {
-	                            Swal.fire("Erro!", "Não foi possível excluir o livro.", "error");
-	                        });
-	                    }
-	                });
-	            }
-	        });
-	    </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Mesma lógica JavaScript que você já tem
+    document.addEventListener("DOMContentLoaded", function () {
+        function loadBooks() {
+            fetch('/api/books')
+                .then(response => response.json())
+                .then(data => {
+                    const bookList = document.getElementById("book-list");
+                    bookList.innerHTML = "";
 
-	<style>
-		body {
-			font-family: 'Arial', sans-serif;
-			margin: 20px;
-			padding: 20px;
-			background-color: #f8f9fa;
-		}
-		h1 {
-			text-align: center;
-			color: #343a40;
-		}
-		form {
-			display: flex;
-			flex-direction: column;
-			max-width: 500px;
-			margin: 20px auto;
-			background: #fff;
-			padding: 20px;
-			border-radius: 8px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		}
-		label {
-			margin-top: 10px;
-			font-weight: bold;
-			color: #495057;
-		}
-		input,
-		textarea {
-			padding: 10px;
-			margin-top: 5px;
-			border: 1px solid #ced4da;
-			border-radius: 4px;
-		}
-		button {
-			margin-top: 15px;
-			background-color: #007bff;
-			color: white;
-			border: none;
-			padding: 10px;
-			cursor: pointer;
-			border-radius: 4px;
-			transition: 0.3s;
-		}
-		button:hover {
-			background-color: #0056b3;
-		}
-		table {
-			width: 100%;
-			margin-top: 20px;
-			border-collapse: collapse;
-			background: #fff;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		}
-		th,
-		td {
-			padding: 12px;
-			border: 1px solid #ddd;
-			text-align: left;
-		}
-		th {
-			background-color: #007bff;
-			color: white;
-		}
-		.edit-btn {
-			background-color: #ffc107;
-			color: black;
-		}
-		.edit-btn:hover {
-			background-color: #e0a800;
-		}
-		.delete-btn {
-			background-color: #dc3545;
-			color: white;
-		}
-		.delete-btn:hover {
-			background-color: #c82333;
-		}
-	</style>
+                    data.forEach(book => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${book.id}</td>
+                            <td>${book.title}</td>
+                            <td>${book.author}</td>
+                            <td>${book.description || 'Sem descrição'}</td>
+                            <td>${book.year}</td>
+                            <td>
+                                <button class="edit-btn" data-id="${book.id}" data-title="${book.title}" data-author="${book.author}" data-description="${book.description}" data-year="${book.year}">✏️ Editar</button>
+                                <button class="delete-btn" data-id="${book.id}">🗑️ Excluir</button>
+                            </td>
+                        `;
+                        bookList.appendChild(row);
+                    });
+
+                    document.querySelectorAll('.edit-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                            document.getElementById("book-id").value = this.dataset.id;
+                            document.getElementById("title").value = this.dataset.title;
+                            document.getElementById("author").value = this.dataset.author;
+                            document.getElementById("description").value = this.dataset.description;
+                            document.getElementById("year").value = this.dataset.year;
+                        });
+                    });
+
+                    document.querySelectorAll('.delete-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                            deleteBook(this.dataset.id);
+                        });
+                    });
+                })
+                .catch(error => console.error("Erro ao carregar livros:", error));
+        }
+
+        loadBooks();
+
+        document.getElementById("book-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById("book-id").value;
+            const title = document.getElementById("title").value;
+            const author = document.getElementById("author").value;
+            const description = document.getElementById("description").value;
+            const year = document.getElementById("year").value;
+
+            const method = bookId ? "PUT" : "POST";
+            const url = bookId ? `/api/books/${bookId}` : "/api/books";
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title, author, description, year })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao salvar livro");
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Sucesso!",
+                        text: bookId ? "Livro atualizado com sucesso!" : "Livro adicionado com sucesso!",
+                    });
+                    loadBooks();
+                    document.getElementById("book-form").reset();
+                    document.getElementById("book-id").value = "";
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erro!",
+                        text: "Não foi possível salvar o livro.",
+                    });
+                });
+        });
+
+        function deleteBook(bookId) {
+            Swal.fire({
+                title: "Tem certeza?",
+                text: "Essa ação não pode ser desfeita!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/api/books/${bookId}`, {
+                        method: "DELETE"
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Erro ao excluir livro");
+                            }
+                            Swal.fire("Deletado!", "O livro foi removido com sucesso.", "success");
+                            loadBooks();
+                        })
+                        .catch(() => {
+                            Swal.fire("Erro!", "Não foi possível excluir o livro.", "error");
+                        });
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 20px;
+        padding: 20px;
+        background-color: #f8f9fa;
+    }
+
+    h1 {
+        text-align: center;
+        color: #343a40;
+    }
+
+    .main-layout {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .left-column,
+    .right-column {
+        flex: 1;
+    }
+
+    .left-column {
+        max-width: 350px;
+    }
+
+    form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tabela dentro do formulário */
+    table {
+        width: 100%;
+        margin: 10px 0;
+        border-collapse: collapse;
+    }
+
+    td {
+        padding: 8px;
+        font-size: 1rem;
+    }
+
+    label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1rem;
+    }
+
+    input,
+    textarea {
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        width: 100%;
+        margin-top: 5px;
+        transition: border-color 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+        border-color: #28a745; /* Cor verde para o foco */
+        outline: none;
+    }
+
+    button {
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 100%;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+        background-color: #218838; /* Verde mais escuro no hover */
+        transform: translateY(-3px);
+    }
+
+    button:active {
+        transform: translateY(2px);
+    }
+
+    /* Tabela de livros */
+    table {
+        width: 100%;
+        background: white;
+        border-collapse: collapse;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    th {
+        background: #007bff;
+        color: white;
+        text-align: left;
+        padding: 15px;
+        font-size: 1.1rem;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    td {
+        padding: 12px;
+        font-size: 1rem;
+        border-bottom: 1px solid #ddd;
+    }
+
+    td:last-child {
+        display: flex;
+        gap: 10px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .edit-btn {
+        background-color: #ffc107;
+        color: black;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .edit-btn:hover {
+        background-color: #e0a800;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-btn:active {
+        transform: translateY(2px);
+    }
+
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .delete-btn:hover {
+        background-color: #c82333;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .delete-btn:active {
+        transform: translateY(2px);
+    }
+</style>
+
 {% endblock %}
